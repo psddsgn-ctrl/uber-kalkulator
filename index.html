@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Uber — Eres Taxi Kraków</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --border: #e4e4e0;
+    --border-strong: #c8c8c2;
+    --text: #1a1a18;
+    --text-muted: #6b6b66;
+    --text-hint: #9b9b95;
+    --accent: #1a1a18;
+    --green-bg: #eaf3de;
+    --green-text: #3b6d11;
+    --amber-bg: #faeeda;
+    --amber-text: #854f0b;
+    --red-bg: #fcebeb;
+    --red-text: #a32d2d;
+    --teal-bg: #e1f5ee;
+    --teal-text: #085041;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+  }
+
+  header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #1D9E75;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: .875rem;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+  @media (max-width: 520px) {
+    .grid3 { grid-template-columns: 1fr 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+  input[type="number"], input[type="date"] {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 11px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+    transition: border-color .15s;
+  }
+  input:focus { outline: none; border-color: var(--border-strong); background: #fff; }
+
+  .tier-box {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: .6rem .875rem;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green-text); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .badge-red   { background: var(--red-bg);   color: var(--red-text);   }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    margin-top: .25rem;
+  }
+  .btn:hover { opacity: .85; }
+  .btn:active { transform: scale(.98); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-ghost:hover { background: var(--bg); }
+
+  .week-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .wtab {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 13px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-weight: 500;
+    transition: background .12s, border-color .12s;
+  }
+  .wtab:hover { background: #eeeeea; }
+  .wtab.active {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+  th {
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text-hint);
+    padding: 7px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+
+  .btn-del {
+    background: none;
+    border: none;
+    color: var(--text-hint);
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .btn-del:hover { color: var(--red-text); background: var(--red-bg); }
+
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 10px; }
+
+  .metric {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: .875rem 1rem;
+  }
+  .metric-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+  .metric-value { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+  .metric-sub { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+  .metric-hl { background: var(--teal-bg); }
+  .metric-hl .metric-label { color: #0F6E56; }
+  .metric-hl .metric-value { color: var(--teal-text); }
+  .metric-hl .metric-sub { color: #0F6E56; }
+
+  .wyp-box {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: .75rem 1rem;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+
+  .empty {
+    text-align: center;
+    color: var(--text-hint);
+    font-size: 13px;
+    padding: 1.75rem 0;
+  }
+
+  .tbl-wrap { overflow-x: auto; }
+
+  .export-row {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: .75rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Kalkulator zarobków Uber</h1>
+    <p><span class="dot"></span> Eres Taxi Kraków &mdash; dane zapisywane lokalnie w przeglądarce</p>
+  </header>
+
+  <!-- Współczynniki -->
+  <div class="card">
+    <div class="card-title">Twoje współczynniki</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Wsp. akceptacji (%)</label>
+        <input type="number" id="wsp-akc" min="0" max="100" step="0.1" value="96" oninput="saveCoeff();calc()">
+      </div>
+      <div class="field">
+        <label>Wsp. anulacji (%)</label>
+        <input type="number" id="wsp-anu" min="0" max="100" step="0.1" value="3" oninput="saveCoeff();calc()">
+      </div>
+    </div>
+    <div id="tier-info" class="tier-box"></div>
+  </div>
+
+  <!-- Dodaj dzień -->
+  <div class="card">
+    <div class="card-title">Dodaj dzień</div>
+    <div class="grid3">
+      <div class="field"><label>Dzień</label><input type="date" id="inp-dzien"></div>
+      <div class="field"><label>Obrót (zł)</label><input type="number" id="inp-obrot" min="0" step="0.01" placeholder="np. 350"></div>
+      <div class="field"><label>Godziny jazdy</label><input type="number" id="inp-godz" min="0" step="0.5" placeholder="np. 8"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Gotówka odebrana (zł)</label><input type="number" id="inp-gotowka" min="0" step="0.01" placeholder="0" value="0"></div>
+      <div class="field"><label>Zwroty za wjazdy (zł)</label><input type="number" id="inp-zwroty" min="0" step="0.01" placeholder="0" value="0"></div>
+    </div>
+    <button class="btn" onclick="dodaj()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Dodaj dzień
+    </button>
+  </div>
+
+  <!-- Historia -->
+  <div class="card">
+    <div class="card-title">Historia — tygodnie</div>
+    <div class="week-tabs" id="week-tabs"></div>
+    <div id="empty-msg" class="empty">Brak wpisów w tym tygodniu</div>
+    <div class="tbl-wrap">
+      <table id="htable" style="display:none">
+        <thead><tr>
+          <th style="width:92px">Dzień</th>
+          <th style="width:80px">Obrót</th>
+          <th style="width:55px">Godz.</th>
+          <th style="width:75px">Gotówka</th>
+          <th style="width:75px">Zwroty</th>
+          <th style="width:32px"></th>
+        </tr></thead>
+        <tbody id="htbody"></tbody>
+      </table>
+    </div>
+    <div class="export-row">
+      <button class="btn-ghost" onclick="exportCSV()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Eksportuj CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Podsumowanie -->
+  <div class="card">
+    <div class="card-title">Podsumowanie tygodnia</div>
+    <div class="metrics" id="metrics-top"></div>
+    <div class="metrics" id="metrics-bot"></div>
+    <div class="divider"></div>
+    <div class="card-title" style="margin-bottom:.5rem">Koszt wypłaty w następnym tygodniu</div>
+    <div id="wyp-info" class="wyp-box"></div>
+  </div>
+
+</div>
+
+<script>
+let allDni = {};
+let currentWeek = '';
+
+function init() {
+  try { let c = JSON.parse(localStorage.getItem('uber-coeff')); if(c){document.getElementById('wsp-akc').value=c.akc;document.getElementById('wsp-anu').value=c.anu;} } catch(e){}
+  try { allDni = JSON.parse(localStorage.getItem('uber-dni')) || {}; } catch(e){ allDni={}; }
+  let today = new Date().toISOString().slice(0,10);
+  document.getElementById('inp-dzien').value = today;
+  currentWeek = getWeekKey(today);
+  renderWeekTabs();
+  renderHistoria();
+  calc();
+}
+
+function getWeekKey(dateStr) {
+  let d = new Date(dateStr + 'T12:00:00');
+  let day = d.getDay();
+  let diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  let mon = new Date(d); mon.setDate(diff);
+  return mon.toISOString().slice(0,10);
+}
+
+function getWeekLabel(wk) {
+  let mon = new Date(wk + 'T12:00:00');
+  let sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  let fmt = d => d.toLocaleDateString('pl-PL', {day:'numeric', month:'short'});
+  return fmt(mon) + ' – ' + fmt(sun);
+}
+
+function getAllWeeks() {
+  let weeks = new Set(Object.keys(allDni).map(d => getWeekKey(d)));
+  weeks.add(getWeekKey(new Date().toISOString().slice(0,10)));
+  return [...weeks].sort().reverse();
+}
+
+function renderWeekTabs() {
+  let weeks = getAllWeeks();
+  document.getElementById('week-tabs').innerHTML = weeks.map(w =>
+    `<button class="wtab${w === currentWeek ? ' active' : ''}" onclick="switchWeek('${w}')">${getWeekLabel(w)}</button>`
+  ).join('');
+}
+
+function switchWeek(wk) { currentWeek = wk; renderWeekTabs(); renderHistoria(); calc(); }
+
+function getWeekDni() {
+  return Object.entries(allDni)
+    .filter(([d]) => getWeekKey(d) === currentWeek)
+    .map(([d,v]) => ({dzien:d,...v}))
+    .sort((a,b) => a.dzien.localeCompare(b.dzien));
+}
+
+function getTier(akc, anu) {
+  if (akc >= 95 && anu < 5) return {pct:55, label:'55%', cls:'badge-green', desc:'Akceptacja ≥95% i anulacje <5%'};
+  if (akc >= 75 && anu < 5) return {pct:50, label:'50%', cls:'badge-amber', desc:'Akceptacja 75–94% i anulacje <5%'};
+  return {pct:45, label:'45%', cls:'badge-red', desc:'Akceptacja <75% lub anulacje ≥5%'};
+}
+
+function fmt(v) { return v.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' zł'; }
+
+function calc() {
+  let akc = parseFloat(document.getElementById('wsp-akc').value) || 0;
+  let anu = parseFloat(document.getElementById('wsp-anu').value) || 0;
+  let tier = getTier(akc, anu);
+  document.getElementById('tier-info').innerHTML =
+    'Twój próg: <strong>' + tier.label + '</strong><span class="badge ' + tier.cls + '">' + tier.desc + '</span>';
+
+  let dni = getWeekDni();
+  let obrot=0, godz=0, gotowka=0, zwroty=0;
+  for (let d of dni) { obrot+=d.obrot; godz+=d.godz; gotowka+=d.gotowka; zwroty+=d.zwroty; }
+
+  let proc = obrot * tier.pct / 100;
+  let netto = proc - gotowka + zwroty;
+  let obtH = godz > 0 ? obrot / godz : 0;
+
+  document.getElementById('metrics-top').innerHTML = `
+    <div class="metric"><div class="metric-label">Łączny obrót</div><div class="metric-value">${fmt(obrot)}</div></div>
+    <div class="metric"><div class="metric-label">Łączne godziny</div><div class="metric-value">${godz.toFixed(1)} h</div></div>
+    <div class="metric"><div class="metric-label">Śr. obrót / h</div><div class="metric-value">${godz > 0 ? fmt(obtH) : '—'}</div></div>
+  `;
+  document.getElementById('metrics-bot').innerHTML = `
+    <div class="metric"><div class="metric-label">Twój % z obrotu (${tier.pct}%)</div><div class="metric-value">${fmt(proc)}</div></div>
+    <div class="metric"><div class="metric-label">Odebrana gotówka</div><div class="metric-value">${fmt(gotowka)}</div></div>
+    <div class="metric"><div class="metric-label">Zwroty za wjazdy</div><div class="metric-value">${fmt(zwroty)}</div></div>
+    <div class="metric metric-hl" style="grid-column:1/-1">
+      <div class="metric-label">Do wypłaty (netto)</div>
+      <div class="metric-value">${fmt(netto)}</div>
+      <div class="metric-sub">${tier.pct}% z obrotu − gotówka + zwroty</div>
+    </div>
+  `;
+
+  let wyp, inf;
+  if (obrot >= 3000) {
+    wyp = 0; inf = 'Obrót ≥ 3 000 zł → <strong>wypłata bezpłatna</strong> <span class="badge badge-green">free</span>';
+  } else if (obrot >= 2000) {
+    wyp = netto * 0.01;
+    inf = 'Obrót 2 000–3 000 zł → koszt: <strong>1% = ' + fmt(wyp) + '</strong><br>Otrzymasz: <strong>' + fmt(netto - wyp) + '</strong>';
+  } else if (obrot >= 1000) {
+    wyp = 10 + netto * 0.01;
+    inf = 'Obrót 1 000–2 000 zł → koszt: <strong>10 zł + 1% = ' + fmt(wyp) + '</strong><br>Otrzymasz: <strong>' + fmt(netto - wyp) + '</strong>';
+  } else {
+    wyp = 50 + netto * 0.01;
+    inf = 'Obrót <1 000 zł → koszt: <strong>50 zł + 1% = ' + fmt(wyp) + '</strong><br>Otrzymasz: <strong>' + fmt(netto - wyp) + '</strong>';
+  }
+  document.getElementById('wyp-info').innerHTML = inf;
+}
+
+function renderHistoria() {
+  let dni = getWeekDni();
+  document.getElementById('empty-msg').style.display = dni.length === 0 ? 'block' : 'none';
+  document.getElementById('htable').style.display = dni.length === 0 ? 'none' : 'table';
+  document.getElementById('htbody').innerHTML = dni.map(d => {
+    let lbl = new Date(d.dzien + 'T12:00:00').toLocaleDateString('pl-PL', {weekday:'short', day:'numeric', month:'numeric'});
+    return `<tr>
+      <td>${lbl}</td>
+      <td>${d.obrot.toFixed(2)} zł</td>
+      <td>${d.godz} h</td>
+      <td>${d.gotowka.toFixed(2)} zł</td>
+      <td>${d.zwroty.toFixed(2)} zł</td>
+      <td><button class="btn-del" onclick="usun('${d.dzien}')" title="Usuń">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveAll() { localStorage.setItem('uber-dni', JSON.stringify(allDni)); }
+function saveCoeff() {
+  localStorage.setItem('uber-coeff', JSON.stringify({
+    akc: document.getElementById('wsp-akc').value,
+    anu: document.getElementById('wsp-anu').value
+  }));
+}
+
+function dodaj() {
+  let dzien = document.getElementById('inp-dzien').value;
+  let obrot = parseFloat(document.getElementById('inp-obrot').value);
+  let godz  = parseFloat(document.getElementById('inp-godz').value);
+  let gotowka = parseFloat(document.getElementById('inp-gotowka').value) || 0;
+  let zwroty  = parseFloat(document.getElementById('inp-zwroty').value) || 0;
+  if (!dzien || isNaN(obrot) || isNaN(godz)) { alert('Wypełnij dzień, obrót i godziny jazdy.'); return; }
+  allDni[dzien] = {obrot, godz, gotowka, zwroty};
+  currentWeek = getWeekKey(dzien);
+  saveAll();
+  document.getElementById('inp-obrot').value = '';
+  document.getElementById('inp-godz').value = '';
+  document.getElementById('inp-gotowka').value = '0';
+  document.getElementById('inp-zwroty').value = '0';
+  renderWeekTabs();
+  renderHistoria();
+  calc();
+}
+
+function usun(dzien) {
+  if (!confirm('Usunąć wpis z dnia ' + dzien + '?')) return;
+  delete allDni[dzien];
+  saveAll();
+  renderWeekTabs();
+  renderHistoria();
+  calc();
+}
+
+function exportCSV() {
+  let rows = [['Dzień','Obrót (zł)','Godziny','Gotówka (zł)','Zwroty (zł)']];
+  let dni = getWeekDni();
+  for (let d of dni) rows.push([d.dzien, d.obrot, d.godz, d.gotowka, d.zwroty]);
+  let csv = rows.map(r => r.join(';')).join('\n');
+  let a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+  a.download = 'uber_' + currentWeek + '.csv';
+  a.click();
+}
+
+init();
+</script>
+</body>
+</html>
